@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+    </head>
+    <style>
+        table, td, th {
+            border: 1px solid black;
+        }
+        td {
+            padding: 10px;
+        }
+    </style>
+    <body>
+        <center>
+            <h1 id="header"></h1>
+            <table id="stock-table"></table>
+        </center>
+    </body>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const ticker = urlParams.get('ticker');
+        // make ticker uppercase
+        const tickerUpper = ticker.toUpperCase();
+        document.getElementById("header").innerHTML = "$" + tickerUpper;
+        fetch('https://api.polygon.io/v2/aggs/ticker/' + tickerUpper + '/prev?adjusted=true&apiKey=YQfgvWe1JL6OG1eodM6vbpGdbe5Sui_b')
+        .then(response => response.json())
+        .then((data) =>  {
+            let html = '<tr><th>Ticker</th><th>Open</th><th>Close</th><th>High</th><th>Low</th></tr>';
+            for (let i = 0; i < data.results.length; i++) {
+                html += '<tr><td>' + data.results[i].T + '</td><td>' + data.results[i].o + '</td><td>' + data.results[i].c + '</td><td>' + data.results[i].h + '</td><td>' + data.results[i].l + '</td></tr>';
+            }
+            document.getElementById("stock-table").innerHTML = html;
+            console.log(data);
+        })
+    </script>
+</html>

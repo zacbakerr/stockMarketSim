@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+    </head>
+    <style>
+        table, td, th {
+            border: 1px solid black;
+        }
+        td {
+            padding: 10px;
+        }
+        a:link {
+        color: #000;
+        font-weight: bold;
+        text-decoration: none;
+        }
+        a:visited {
+            color: #000;
+        }
+        #search {
+            width: 30vw;
+            height: 5vh;
+            border-radius: 20px;
+            padding-left: 15px;
+            font-size: 17px;
+            font-family: arial,sans-serif;
+        }
+        #searchButton {
+            width: 10vw;
+            height: 5vh;
+            border-radius: 15px;
+            color: #000;
+            font-size: 17px;
+            font-family: arial,sans-serif;
+        }
+        #nextButton {
+            padding-left: 72vw;
+        }
+    </style>
+    <body>
+        <center>
+            <h1 style="font-family: arial,sans-serif">Stock Market Searcher</h1>
+            <input type="text" id="search" placeholder="Enter ticker...">
+            <br><br>
+            <button onclick="search()" id="searchButton">Search</button>
+            <br><br><br>
+        </center>
+            <div id="nextButton">
+                <button onclick="next()" id="searchButton">Next</button>
+            </div>
+            <br>
+        <center>
+            <table id="ticker-table" style="width: 66vw"></table>
+            <br><br>
+            <button  onclick="next()" id="searchButton">Next</button>
+            <br><br>
+        </center>
+    </body>
+    <script>
+        let nextUrl = ""
+        fetch('https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&sort=ticker&order=asc&limit=41000&apiKey=YQfgvWe1JL6OG1eodM6vbpGdbe5Sui_b')
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Request failed.');
+            }
+        })
+        .then((data) => {
+            // format data into html table
+            let html = '<tr><th>Ticker</th><th>Name</th><th>Exchange</th></tr>';
+            // iterate through data.results
+            data.results.forEach(function(item) {
+                html += '<tr>';
+                    html += '<td>' + item.ticker + '</td>';
+                    html += '<td><a href="stock.html?ticker=' + item.ticker + '">' + item.name + '</a></td>';
+                    if (item.primary_exchange) {
+                        html += '<td>' + item.primary_exchange + '</td>';
+                    } else {
+                        html += '<td>N/A</td>';
+                    }
+                html += '</tr>';
+            });
+            document.getElementById('ticker-table').innerHTML = html;
+            nextUrl = data.next_url;
+        })
+
+        function next() {
+            console.log(nextUrl + "&apiKey=YQfgvWe1JL6OG1eodM6vbpGdbe5Sui_b");
+            fetch(nextUrl + "&apiKey=YQfgvWe1JL6OG1eodM6vbpGdbe5Sui_b")
+            .then(response => response.json())
+            .then((data) => {
+                // format data into html table
+                let html = '<tr><th>Ticker</th><th>Name</th><th>Exchange</th></tr>';
+                // iterate through data.results
+                data.results.forEach(function(item) {
+                    html += '<tr>';
+                        html += '<td>' + item.ticker + '</td>';
+                        html += '<td><a href="stock.html?ticker=' + item.ticker + '">' + item.name + '</a></td>';
+                        if (item.primary_exchange) {
+                            html += '<td>' + item.primary_exchange + '</td>';
+                        } else {
+                            html += '<td>N/A</td>';
+                        }
+                    html += '</tr>';
+                });
+                document.getElementById('ticker-table').innerHTML = html;
+                nextUrl = data.next_url;
+            })
+        }
+
+        function search() {
+            let search = document.getElementById('search').value;
+            window.location.href = 'stock.html?ticker=' + search;
+        }
+    </script>
+</html>
